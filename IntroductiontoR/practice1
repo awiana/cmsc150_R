@@ -14,78 +14,92 @@ A <- matrix(
 print(A)
 
 # DETERMINANTS
-# Recursive function to calculate determinant of an n x n matrix
+# Recursive function to calculate the determinant of an n x n matrix
 determinantRecursive <- function(mat) {
-  n <- nrow(mat)
+  n <- nrow(mat)  # Get the number of rows (or columns, since it's square) of the matrix
   
-  # Base case for 2x2 matrix
+  # Base case: if the matrix is 2x2, directly calculate the determinant
   if (n == 2) {
     return(mat[1,1] * mat[2,2] - mat[1,2] * mat[2,1])
   }
   
-  det_val <- 0
+  det_val <- 0  # Initialize determinant value to 0
+  
+  # Loop over each column in the first row
   for (i in 1:n) {
-    # Sub-matrix excluding row 1 and column i
+    # Create a sub-matrix by removing the first row and the i-th column
     sub_mat <- mat[-1, -i]
+    
+    # Calculate the cofactor, which is (-1)^(1 + i) times the determinant of the sub-matrix
     cofactor <- (-1)^(1 + i) * mat[1, i] * determinantRecursive(sub_mat)
+    
+    # Add the cofactor to the determinant value
     det_val <- det_val + cofactor
   }
   
-  return(det_val)
+  return(det_val)  # Return the final determinant value
 }
 
 # MINORS
 # Function to calculate the matrix of minors
 minorsMatrix <- function(mat) {
-  n <- nrow(mat)
-  minors <- matrix(0, nrow = n, ncol = n)
+  n <- nrow(mat)  # Get the number of rows (or columns) of the matrix
+  minors <- matrix(0, nrow = n, ncol = n)  # Initialize a matrix to hold minors
   
+  # Loop over each element in the matrix
   for (i in 1:n) {
     for (j in 1:n) {
-      sub_mat <- mat[-i, -j]  # Sub-matrix without row i and column j
+      # Create a sub-matrix by removing the i-th row and j-th column
+      sub_mat <- mat[-i, -j]
+      
+      # Calculate the determinant of the sub-matrix and assign it to the minor matrix
       minors[i, j] <- determinantRecursive(sub_mat)
     }
   }
   
-  return(minors)
+  return(minors)  # Return the matrix of minors
 }
 
-#COFACTORS
+# COFACTORS
 # Function to calculate the cofactor matrix
 cofactorMatrix <- function(mat) {
-  n <- nrow(mat)
-  minors <- minorsMatrix(mat)
-  cofactors <- matrix(0, nrow = n, ncol = n)
+  n <- nrow(mat)  # Get the number of rows (or columns) of the matrix
+  minors <- minorsMatrix(mat)  # Get the matrix of minors
+  cofactors <- matrix(0, nrow = n, ncol = n)  # Initialize a matrix to hold cofactors
   
+  # Loop over each element in the matrix
   for (i in 1:n) {
     for (j in 1:n) {
+      # Calculate the cofactor by applying the sign change to the corresponding minor
       cofactors[i, j] <- (-1)^(i + j) * minors[i, j]
     }
   }
   
-  return(cofactors)
+  return(cofactors)  # Return the matrix of cofactors
 }
 
-#ADJOINT
+# ADJOINT
 # Function to calculate the adjoint (adjugate) matrix
 adjointMatrix <- function(mat) {
-  cofactor_mat <- cofactorMatrix(mat)
-  return(t(cofactor_mat))  # Transpose of the cofactor matrix
+  cofactor_mat <- cofactorMatrix(mat)  # Get the matrix of cofactors
+  return(t(cofactor_mat))  # Return the transpose of the cofactor matrix as the adjoint
 }
 
-#INVERSE
+# INVERSE
 # Function to calculate the inverse of a matrix
 inverseMatrix <- function(mat) {
-  det_val <- determinantRecursive(mat)
+  det_val <- determinantRecursive(mat)  # Calculate the determinant of the matrix
   
+  # Check if the determinant is zero, meaning the matrix is singular (non-invertible)
   if (det_val == 0) {
     stop("The matrix is singular and does not have an inverse.")
   }
   
-  adjoint <- adjointMatrix(mat)
-  inverse <- adjoint / det_val
-  return(inverse)
+  adjoint <- adjointMatrix(mat)  # Get the adjoint (or adjugate) matrix
+  inverse <- adjoint / det_val  # Calculate the inverse by dividing the adjoint by the determinant
+  return(inverse)  # Return the inverse matrix
 }
+
 
 
 #EXAMPLE CODE

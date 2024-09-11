@@ -1,0 +1,126 @@
+# cofactors
+# determinants
+# minors
+# adjoint 
+
+A <- matrix(
+    c(1, 2, 3, 4),
+    nrow = 2,
+    ncol = 2,
+    byrow = TRUE,
+    dimnames <- list(paste('Row', 1:2, sep=' '), paste('Col', 1:2, sep=' '))
+            )
+
+print(A)
+
+# DETERMINANTS
+# Recursive function to calculate determinant of an n x n matrix
+determinantRecursive <- function(mat) {
+  n <- nrow(mat)
+  
+  # Base case for 2x2 matrix
+  if (n == 2) {
+    return(mat[1,1] * mat[2,2] - mat[1,2] * mat[2,1])
+  }
+  
+  det_val <- 0
+  for (i in 1:n) {
+    # Sub-matrix excluding row 1 and column i
+    sub_mat <- mat[-1, -i]
+    cofactor <- (-1)^(1 + i) * mat[1, i] * determinantRecursive(sub_mat)
+    det_val <- det_val + cofactor
+  }
+  
+  return(det_val)
+}
+
+# MINORS
+# Function to calculate the matrix of minors
+minorsMatrix <- function(mat) {
+  n <- nrow(mat)
+  minors <- matrix(0, nrow = n, ncol = n)
+  
+  for (i in 1:n) {
+    for (j in 1:n) {
+      sub_mat <- mat[-i, -j]  # Sub-matrix without row i and column j
+      minors[i, j] <- determinantRecursive(sub_mat)
+    }
+  }
+  
+  return(minors)
+}
+
+#COFACTORS
+# Function to calculate the cofactor matrix
+cofactorMatrix <- function(mat) {
+  n <- nrow(mat)
+  minors <- minorsMatrix(mat)
+  cofactors <- matrix(0, nrow = n, ncol = n)
+  
+  for (i in 1:n) {
+    for (j in 1:n) {
+      cofactors[i, j] <- (-1)^(i + j) * minors[i, j]
+    }
+  }
+  
+  return(cofactors)
+}
+
+#ADJOINT
+# Function to calculate the adjoint (adjugate) matrix
+adjointMatrix <- function(mat) {
+  cofactor_mat <- cofactorMatrix(mat)
+  return(t(cofactor_mat))  # Transpose of the cofactor matrix
+}
+
+#INVERSE
+# Function to calculate the inverse of a matrix
+inverseMatrix <- function(mat) {
+  det_val <- determinantRecursive(mat)
+  
+  if (det_val == 0) {
+    stop("The matrix is singular and does not have an inverse.")
+  }
+  
+  adjoint <- adjointMatrix(mat)
+  inverse <- adjoint / det_val
+  return(inverse)
+}
+
+
+#EXAMPLE CODE
+# Example 3x3 matrix
+A <- matrix(c(2, -1, 0, 
+              3, 1, 4, 
+              1, 0, 5), nrow = 3, byrow = TRUE)
+
+# Print the matrix
+print("Matrix A:")
+print(A)
+
+# 1. Determinant of A
+det_A <- determinantRecursive(A)
+print("Determinant of A:")
+print(det_A)
+
+# 2. Minors of A
+minors_A <- minorsMatrix(A)
+print("Minors of A:")
+print(minors_A)
+
+# 3. Cofactors of A
+cofactors_A <- cofactorMatrix(A)
+print("Cofactors of A:")
+print(cofactors_A)
+
+# 4. Adjoint (adjugate) of A
+adjoint_A <- adjointMatrix(A)
+print("Adjoint of A:")
+print(adjoint_A)
+
+# 5. Inverse of A
+inverse_A <- inverseMatrix(A)
+print("Inverse of A:")
+print(inverse_A)
+
+
